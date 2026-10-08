@@ -10,5 +10,7 @@ public interface IRoomRepository
 public interface IBookingRepository
 {
     Task<IReadOnlyList<Booking>> GetByRoomAsync(int roomId);
+    Task<Booking?> GetByIdAsync(int id);   // thêm dòng này
     Task AddAsync(Booking booking);
 }
+

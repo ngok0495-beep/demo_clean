@@ -2,12 +2,12 @@ using Application;
 using Microsoft.AspNetCore.Mvc;
 namespace Api.Presenters;
 
-public class CreateBookingPresenter : ICreateBookingOutputBoundary
+public class GetBookingPresenter : IGetBookingOutputBoundary
 {
     public IActionResult? ViewModel { get; private set; }
 
-    public void PresentSuccess(BookingDto b) =>
-        ViewModel = new CreatedResult($"/api/bookings/{b.Id}", BookingViewModel.From(b));
+    public void PresentBooking(BookingDto b) =>
+        ViewModel = new OkObjectResult(BookingViewModel.From(b));
 
     public void PresentError(ErrorKind kind, string message) =>
         ViewModel = ProblemResults.From(kind, message);

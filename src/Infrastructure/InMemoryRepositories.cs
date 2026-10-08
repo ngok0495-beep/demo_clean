@@ -18,6 +18,8 @@ public class InMemoryRoomRepository : IRoomRepository
 
 public class InMemoryBookingRepository : IBookingRepository
 {
+    public Task<Booking?> GetByIdAsync(int id) =>
+    Task.FromResult(_items.FirstOrDefault(b => b.Id == id));
     private readonly List<Booking> _items = [];
     private int _nextId = 1;
 
