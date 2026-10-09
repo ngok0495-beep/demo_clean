@@ -1,8 +1,14 @@
 using Domain;
 namespace Application;
 
+public interface ICancelBookingInputBoundary { Task ExecuteAsync(int bookingId); }
+public interface ICancelBookingOutputBoundary
+{
+    void PresentCancelled(CancelResultDto result);
+    void PresentError(ErrorKind kind, string message);
+}
+
 public class CancelBookingUseCase(
-    IRoomRepository rooms,
     IBookingRepository bookings,
     TimeProvider time,
     ICancelBookingOutputBoundary output) : ICancelBookingInputBoundary
@@ -18,9 +24,8 @@ public class CancelBookingUseCase(
 
         try
         {
-            var room = (await rooms.GetByIdAsync(booking.RoomId))!;
-            // Giả định khách đã thanh toán đủ tổng tiền khi đặt
-            var refund = booking.Cancel(time.GetLocalNow().DateTime, BookingMapper.TotalPrice(booking, room));
+            var refund = booking.Cancel(time.GetLocalNow().DateTime);
+            await bookings.UpdateAsync(booking);
             output.PresentCancelled(new CancelResultDto(booking.Id, booking.Status.ToString(), refund));
         }
         catch (DomainException ex) { output.PresentError(ErrorKind.Conflict, ex.Message); }

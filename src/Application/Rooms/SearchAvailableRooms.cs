@@ -1,6 +1,13 @@
 using Domain;
 namespace Application;
 
+public interface ISearchAvailableRoomsInputBoundary { Task ExecuteAsync(SearchRoomsQuery query); }
+public interface ISearchAvailableRoomsOutputBoundary
+{
+    void PresentRooms(IReadOnlyList<RoomDto> rooms);
+    void PresentError(ErrorKind kind, string message);
+}
+
 public record SearchRoomsQuery(DateOnly? From, DateOnly? To, string? Type);
 public record RoomDto(int Id, string Number, string Type, decimal PricePerNight);
 
@@ -23,15 +30,20 @@ public class SearchAvailableRoomsUseCase(
             var result = new List<RoomDto>();
             foreach (var r in await rooms.GetAllAsync())
             {
-                if (q.Type is not null && !r.Type.Equals(q.Type, StringComparison.OrdinalIgnoreCase)) continue;
+                if (q.Type is not null && !r.RoomType.Name.Equals(q.Type, StringComparison.OrdinalIgnoreCase)) continue;
+
+                // Phòng đang bảo trì không bao giờ hiển thị (dù có hay không có filter ngày)
+                if (r.Status == RoomStatus.Maintenance) continue;
 
                 if (byDate)
                 {
-                    if (r.Status == RoomStatus.Maintenance) continue;
                     var existing = await bookings.GetByRoomAsync(r.Id);
                     if (existing.Any(b => b.Overlaps(q.From!.Value, q.To!.Value))) continue;
                 }
-                result.Add(new RoomDto(r.Id, r.Number, r.Type, r.PricePerNight));
+
+                // Có ngày: giá của đêm nhận phòng (đã tính mùa vụ); không có ngày: giá cơ bản
+                var price = byDate ? r.RoomType.PriceOn(q.From!.Value) : r.RoomType.BasePrice;
+                result.Add(new RoomDto(r.Id, r.Number, r.RoomType.Name, price));
             }
             output.PresentRooms(result);
         }

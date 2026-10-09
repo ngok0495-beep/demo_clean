@@ -1,7 +1,14 @@
 namespace Application;
 
+public interface IGetBookingInputBoundary { Task ExecuteAsync(int bookingId); }
+public interface IGetBookingOutputBoundary
+{
+    void PresentBooking(BookingDto booking);
+    void PresentError(ErrorKind kind, string message);
+}
+
 public class GetBookingUseCase(
-    IRoomRepository rooms,
+    ICustomerRepository customers,
     IBookingRepository bookings,
     IGetBookingOutputBoundary output) : IGetBookingInputBoundary
 {
@@ -13,7 +20,7 @@ public class GetBookingUseCase(
             output.PresentError(ErrorKind.NotFound, "Không tìm thấy đặt phòng.");
             return;
         }
-        var room = (await rooms.GetByIdAsync(booking.RoomId))!;
-        output.PresentBooking(BookingMapper.ToDto(booking, room));
+        var customer = await customers.GetByIdAsync(booking.CustomerId);
+        output.PresentBooking(BookingMapper.ToDto(booking, customer?.FullName ?? ""));
     }
 }

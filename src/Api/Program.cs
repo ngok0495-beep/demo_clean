@@ -1,6 +1,7 @@
 using Api.Presenters;
 using Application;
 using Infrastructure;
+using Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -9,6 +10,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 
 // Gateway (Infrastructure)
 builder.Services.AddSingleton<IRoomRepository, InMemoryRoomRepository>();
+builder.Services.AddSingleton<ICustomerRepository, InMemoryCustomerRepository>();
 builder.Services.AddSingleton<IBookingRepository, InMemoryBookingRepository>();
 
 // Use case (Input Boundary)

@@ -9,7 +9,7 @@ public class BookingsController : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> Create(
-        CreateBookingRequest request,
+        [FromBody] CreateBookingRequest request,
         [FromServices] ICreateBookingInputBoundary useCase,
         [FromServices] CreateBookingPresenter presenter)
     {
