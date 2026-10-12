@@ -11,6 +11,7 @@ public static class DependencyInjection
         services.AddDbContext<HotelDbContext>(o => o.UseSqlServer(connectionString));
         services.AddScoped<IRoomRepository, EfRoomRepository>();
         services.AddScoped<IRoomManagementRepository, EfRoomManagementRepository>();
+        services.AddScoped<IServiceCatalogRepository, EfServiceCatalogRepository>();
         services.AddScoped<ICustomerRepository, EfCustomerRepository>();
         services.AddScoped<IBookingRepository, EfBookingRepository>();
         return services;

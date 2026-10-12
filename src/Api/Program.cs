@@ -15,6 +15,7 @@ builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("Ho
 
 // Use case (Input Boundary)
 builder.Services.AddScoped<IManageRoomsInputBoundary, ManageRoomsUseCase>();
+builder.Services.AddScoped<IManageServicesInputBoundary, ManageServicesUseCase>();
 builder.Services.AddScoped<ISearchAvailableRoomsInputBoundary, SearchAvailableRoomsUseCase>();
 builder.Services.AddScoped<ICreateBookingInputBoundary, CreateBookingUseCase>();
 builder.Services.AddScoped<IGetBookingInputBoundary, GetBookingUseCase>();
@@ -23,6 +24,8 @@ builder.Services.AddScoped<ICancelBookingInputBoundary, CancelBookingUseCase>();
 // Presenter (Output Boundary): cùng 1 instance cho use case và controller trong mỗi request
 builder.Services.AddScoped<ManageRoomsPresenter>();
 builder.Services.AddScoped<IManageRoomsOutputBoundary>(sp => sp.GetRequiredService<ManageRoomsPresenter>());
+builder.Services.AddScoped<ManageServicesPresenter>();
+builder.Services.AddScoped<IManageServicesOutputBoundary>(sp => sp.GetRequiredService<ManageServicesPresenter>());
 builder.Services.AddScoped<SearchRoomsPresenter>();
 builder.Services.AddScoped<ISearchAvailableRoomsOutputBoundary>(sp => sp.GetRequiredService<SearchRoomsPresenter>());
 builder.Services.AddScoped<CreateBookingPresenter>();
