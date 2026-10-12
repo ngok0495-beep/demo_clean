@@ -1,25 +1,28 @@
 using Api.Presenters;
 using Application;
 using Infrastructure;
-using Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton(TimeProvider.System);
 
 // Gateway (Infrastructure)
-builder.Services.AddSingleton<IRoomRepository, InMemoryRoomRepository>();
-builder.Services.AddSingleton<ICustomerRepository, InMemoryCustomerRepository>();
-builder.Services.AddSingleton<IBookingRepository, InMemoryBookingRepository>();
+builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("HotelDb")
+    ?? throw new InvalidOperationException("Thiếu ConnectionStrings:HotelDb."));
 
 // Use case (Input Boundary)
+builder.Services.AddScoped<IManageRoomsInputBoundary, ManageRoomsUseCase>();
 builder.Services.AddScoped<ISearchAvailableRoomsInputBoundary, SearchAvailableRoomsUseCase>();
 builder.Services.AddScoped<ICreateBookingInputBoundary, CreateBookingUseCase>();
 builder.Services.AddScoped<IGetBookingInputBoundary, GetBookingUseCase>();
 builder.Services.AddScoped<ICancelBookingInputBoundary, CancelBookingUseCase>();
 
 // Presenter (Output Boundary): cùng 1 instance cho use case và controller trong mỗi request
+builder.Services.AddScoped<ManageRoomsPresenter>();
+builder.Services.AddScoped<IManageRoomsOutputBoundary>(sp => sp.GetRequiredService<ManageRoomsPresenter>());
 builder.Services.AddScoped<SearchRoomsPresenter>();
 builder.Services.AddScoped<ISearchAvailableRoomsOutputBoundary>(sp => sp.GetRequiredService<SearchRoomsPresenter>());
 builder.Services.AddScoped<CreateBookingPresenter>();
@@ -30,5 +33,12 @@ builder.Services.AddScoped<CancelBookingPresenter>();
 builder.Services.AddScoped<ICancelBookingOutputBoundary>(sp => sp.GetRequiredService<CancelBookingPresenter>());
 
 var app = builder.Build();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 app.MapControllers();
 app.Run();
+
+public partial class Program { }
