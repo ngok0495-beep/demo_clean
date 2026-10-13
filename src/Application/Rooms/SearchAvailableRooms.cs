@@ -20,8 +20,8 @@ public class SearchAvailableRoomsUseCase(
     {
         try
         {
-            if (q.From.HasValue != q.To.HasValue)
-                throw new AppException(ErrorKind.Validation, "Phải truyền đủ cả from và to, hoặc không truyền cả hai.");
+            // if (q.From.HasValue != q.To.HasValue)
+            //     throw new AppException(ErrorKind.Validation, "Phải truyền đủ cả from và to, hoặc không truyền cả hai.");
 
             var byDate = q.From.HasValue;
             if (byDate && q.To <= q.From)
@@ -45,7 +45,10 @@ public class SearchAvailableRoomsUseCase(
                 var price = byDate ? r.RoomType.PriceOn(q.From!.Value) : r.RoomType.BasePrice;
                 result.Add(new RoomDto(r.Id, r.Number, r.RoomType.Name, price));
             }
-            output.PresentRooms(result);
+            if (result.Count == 0)
+                output.PresentError(ErrorKind.NotFound, "Đã hết phòng phù hợp với yêu cầu tìm kiếm.");
+            else
+                output.PresentRooms(result);
         }
         catch (AppException ex) { output.PresentError(ex.Kind, ex.Message); }
         catch (DomainException ex) { output.PresentError(ErrorKind.Validation, ex.Message); }
