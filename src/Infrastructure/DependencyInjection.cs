@@ -15,9 +15,9 @@ public static class DependencyInjection
         return services;
     }
 
-    public static void ApplyMigrations(this IServiceProvider services)
+    public static void EnsureDatabaseCreated(this IServiceProvider services)
     {
         using var scope = services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<HotelDbContext>().Database.Migrate();
+        scope.ServiceProvider.GetRequiredService<HotelDbContext>().Database.EnsureCreated();
     }
 }

@@ -1,7 +1,7 @@
 using Domain;
 namespace Application;
 
-public interface ICreateBookingInputBoundary { Task ExecuteAsync(CreateBookingRequest request); }
+public  interface  ICreateBookingInputBoundary { Task ExecuteAsync(CreateBookingRequest request); }
 public interface ICreateBookingOutputBoundary
 {
     void PresentSuccess(BookingDto booking);
